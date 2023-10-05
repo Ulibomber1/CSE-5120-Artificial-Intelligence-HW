@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{82b9c48d-0818-4921-8ec0-6d8b6d89cb40}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>valueIteration_for_GridWorld-1.py</StartupFile>
+    <StartupFile>large_board_tic_tac_toe.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -19,6 +19,9 @@
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="GameStatus_5120.py" />
+    <Compile Include="large_board_tic_tac_toe.py" />
+    <Compile Include="multiAgents.py" />
     <Compile Include="valueIteration_for_GridWorld-1.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
