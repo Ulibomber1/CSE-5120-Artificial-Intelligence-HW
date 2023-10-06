@@ -71,19 +71,16 @@ class RandomBoardTicTacToe:
         else:
             pygame.display.set_caption("Tic Tac Toe - X's turn")
 
-
     def draw_circle(self, x, y):
         """
         YOUR CODE HERE TO DRAW THE CIRCLE FOR THE NOUGHTS PLAYER
         """
-        
 
     def draw_cross(self, x, y):
         """
         YOUR CODE HERE TO DRAW THE CROSS FOR THE CROSS PLAYER AT THE CELL THAT IS SELECTED VIA THE gui
         """
-        
-
+      
     def is_game_over(self):
 
         """
@@ -92,11 +89,9 @@ class RandomBoardTicTacToe:
         
         YOUR RETURN VALUE SHOULD BE TRUE OR FALSE TO BE USED IN OTHER PARTS OF THE GAME
         """
-    
 
     def move(self, move):
         self.game_state = self.game_state.get_new_state(move)
-
 
     def play_ai(self):
         """
@@ -113,8 +108,6 @@ class RandomBoardTicTacToe:
         terminal = self.game_state.is_terminal()
         """ USE self.game_state.get_scores(terminal) HERE TO COMPUTE AND DISPLAY THE FINAL SCORES """
 
-
-
     def game_reset(self):
         self.draw_game()
         """
@@ -126,9 +119,7 @@ class RandomBoardTicTacToe:
 
     def play_game(self, mode = "player_vs_ai"):
         done = False
-
         clock = pygame.time.Clock()
-
 
         while not done:
             for event in pygame.event.get():  # User did something
@@ -140,7 +131,8 @@ class RandomBoardTicTacToe:
                 YOUR CODE HERE TO HANDLE THE SITUATION IF THE GAME IS OVER. IF THE GAME IS OVER THEN DISPLAY THE SCORE,
                 THE WINNER, AND POSSIBLY WAIT FOR THE USER TO CLEAR THE BOARD AND START THE GAME AGAIN (OR CLICK EXIT)
                 """
-                    
+                if event.type == pygame.QUIT:
+                    done = True
                 """
                 YOUR CODE HERE TO NOW CHECK WHAT TO DO IF THE GAME IS NOT OVER AND THE USER SELECTED A NON EMPTY CELL
                 IF CLICKED A NON EMPTY CELL, THEN GET THE X,Y POSITION, SET ITS VALUE TO 1 (SELECTED BY HUMAN PLAYER),
@@ -164,6 +156,7 @@ class RandomBoardTicTacToe:
         pygame.quit()
 
 tictactoegame = RandomBoardTicTacToe()
+tictactoegame.play_game()
 """
 YOUR CODE HERE TO SELECT THE OPTIONS VIA THE GUI CALLED FROM THE ABOVE LINE
 AFTER THE ABOVE LINE, THE USER SHOULD SELECT THE OPTIONS AND START THE GAME. 
