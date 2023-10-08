@@ -39,13 +39,26 @@ class GameStatus:
         
         YOU SHOULD THEN RETURN THE CALCULATED SCORE WHICH CAN BE POSITIVE (HUMAN PLAYER WINS),
         NEGATIVE (AI PLAYER WINS), OR 0 (DRAW)
-        """        
+        """   
 		rows = len(self.board_state)
 		cols = len(self.board_state[0])
 		scores = 0
 		check_point = 3 if terminal else 2
+
+		# Simply: self.board_state[row][column]
+
+		# to iterate in a col, do self.board_state[0][j] to [n][j]
+		# to iterate in a row, do self.board_state[i][0] to [i][n] 
+		# to iterate in up-left to down-right diagonal, do self.board_state[0][0] to [n][n]
+		# to iterate in up-right to down-left diagonal, do self.board_state[0][n] to [n][0]
+
+		# therefore, adjacency formulas (diagonals are combinations):
+		# left: self.board_state[i][j-1]
+		# right: self.board_state[i][j + 1]
+		# up: self.board_state[i - 1][j]
+		# down: self.board_state[i + 1][j]
+
 		
-	    
 
 	def get_negamax_scores(self, terminal):
 		"""
@@ -58,7 +71,7 @@ class GameStatus:
 		cols = len(self.board_state[0])
 		scores = 0
 		check_point = 3 if terminal else 2
-	    
+
 
 	def get_moves(self):
 		moves = []
