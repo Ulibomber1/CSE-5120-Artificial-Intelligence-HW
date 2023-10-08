@@ -18,6 +18,18 @@ class GameStatus:
         YOUR CODE HERE TO CHECK IF ANY CELL IS EMPTY WITH THE VALUE 0. IF THERE IS NO EMPTY
         THEN YOU SHOULD ALSO RETURN THE WINNER OF THE GAME BY CHECKING THE SCORES FOR EACH PLAYER 
         """
+		for row in self.board_state:
+			for column in self.board_state[row]:
+				if column == 0:
+					return False
+
+		if self.oldScores == 0:
+			self.winner = "Draw"
+		elif self.oldScores > 0:
+			self.winner = "Human"
+		else:
+			self.winner = "AI"
+		return True
 		
 
 	def get_scores(self, terminal):
@@ -27,7 +39,6 @@ class GameStatus:
         
         YOU SHOULD THEN RETURN THE CALCULATED SCORE WHICH CAN BE POSITIVE (HUMAN PLAYER WINS),
         NEGATIVE (AI PLAYER WINS), OR 0 (DRAW)
-        
         """        
 		rows = len(self.board_state)
 		cols = len(self.board_state[0])
