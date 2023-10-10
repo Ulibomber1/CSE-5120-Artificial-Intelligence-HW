@@ -45,18 +45,35 @@ class GameStatus:
 		scores = 0
 		check_point = 3 if terminal else 2
 
-		# Simply: self.board_state[row][column]
 
-		# to iterate in a col, do self.board_state[0][j] to [n][j]
-		# to iterate in a row, do self.board_state[i][0] to [i][n] 
-		# to iterate in up-left to down-right diagonal, do self.board_state[0][0] to [n][n]
-		# to iterate in up-right to down-left diagonal, do self.board_state[0][n] to [n][0]
+		for row in range(rows):
+			for col in range(cols):
+				origin_state = self.board_state[row][column].state
 
-		# therefore, adjacency formulas (diagonals are combinations):
-		# left: self.board_state[i][j-1]
-		# right: self.board_state[i][j + 1]
-		# up: self.board_state[i - 1][j]
-		# down: self.board_state[i + 1][j]
+				if origin_state == 0:
+					break
+				scoring_sequences = []
+
+				# directions are grouped according to opposing directions
+				directions = [((1,0),(-1,0)),
+							  ((0,1),(0,-1)),
+							  ((1,1),(-1,-1)),
+							  ((-1,1),(1,-1))]
+				
+				for direction in directions:
+					accumulatedSequence = [(column, row)]
+					try:
+						if origin_state == self.board_state[row + direction[0][1]][col + direction[0][0]].state:
+							accumulatedSequence.append((row + direction[0][1], col + direction[0][0]))
+							if origin_state == self.board_state[row + (2 *direction[0][1])][col + (2 * direction[0][0])].state:
+								accumulatedSequence.append((row + (2 * direction[0][1]), col + (2 * direction[0][0])))
+					try:
+						if len(accumulatedSequence) < 3 and origin_state == self.board_state[row + direction[1][1]][col + direction[1][0]].state:
+							accumulatedSequence.append((row + direction[1][1], col + direction[1][0]))
+							if accumulatedSequence < 3 and origin_state == self.board_state[row + (2 * direction[1][1])][col + (2 * direction[1][0])].state:
+								accumulatedSequence.append((row + (2 * direction[1][1]), col + (2 * direction[1][0])))
+					if accumulatedSequence == 3:
+						scores += 1 if origin_state == 1 else -1
 
 		
 
