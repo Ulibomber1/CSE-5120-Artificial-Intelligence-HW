@@ -14,11 +14,23 @@ PLEASE READ THE COMMENTS BELOW AND THE HOMEWORK DESCRIPTION VERY CAREFULLY BEFOR
  PLEASE CAREFULLY SEE THE PORTIONS OF THE CODE/FUNCTIONS WHERE IT INDICATES "YOUR CODE BELOW" TO COMPLETE THE SECTIONS
  
 """
+from decimal import FloatOperation
+from math import floor
 import pygame
 import numpy as np
 from GameStatus_5120 import GameStatus
 from multiAgents import minimax, negamax
 import sys, random
+
+class BoardSpace:
+    def __init__(self,x ,y):
+        self.x = x
+        self.y = y
+        self.state = "empty"
+        self.checkedDirections = {False, False, False, False, False, False, False, False}
+    
+        
+
 
 mode = "player_vs_ai" # default mode for playing the game (player vs AI)
 
@@ -46,6 +58,9 @@ class RandomBoardTicTacToe:
         # This sets the margin between each cell
         self.MARGIN = 5
 
+        # This is for menus before starting the game.
+        self.gameStarted = False
+
         # Initialize pygame
         pygame.init()
         self.game_reset()
@@ -56,13 +71,19 @@ class RandomBoardTicTacToe:
         self.screen = pygame.display.set_mode(self.size)
         pygame.display.set_caption("Tic Tac Toe Random Grid")
         self.screen.fill(self.BLACK)
+        
         # Draw the grid
         
         """
         YOUR CODE HERE TO DRAW THE GRID OTHER CONTROLS AS PART OF THE GUI
         """
+        pygame.display.flip();
         
-        pygame.display.update()
+        for x in range(0,self.GRID_SIZE):
+            for y in range(0,self.GRID_SIZE):
+                pygame.draw.rect(self.screen,self.WHITE,(50 * x +50,50 * y + 50,50,50),2)
+        
+        self.play_game()
 
     def change_turn(self):
 
@@ -71,16 +92,21 @@ class RandomBoardTicTacToe:
         else:
             pygame.display.set_caption("Tic Tac Toe - X's turn")
 
+
     def draw_circle(self, x, y):
         """
         YOUR CODE HERE TO DRAW THE CIRCLE FOR THE NOUGHTS PLAYER
         """
+        
+        pygame.draw.circle(self.screen, self.WHITE, (x, y), 15, 4)
 
     def draw_cross(self, x, y):
         """
         YOUR CODE HERE TO DRAW THE CROSS FOR THE CROSS PLAYER AT THE CELL THAT IS SELECTED VIA THE gui
         """
-      
+        pygame.draw.line(self.screen, self.WHITE, (x - 15, y - 15), (x + 15, y + 15), 3)
+        pygame.draw.line(self.screen, self.WHITE, (x - 15, y + 15), (x + 15, y - 15), 3)
+
     def is_game_over(self):
 
         """
@@ -89,9 +115,11 @@ class RandomBoardTicTacToe:
         
         YOUR RETURN VALUE SHOULD BE TRUE OR FALSE TO BE USED IN OTHER PARTS OF THE GAME
         """
+    
 
     def move(self, move):
         self.game_state = self.game_state.get_new_state(move)
+
 
     def play_ai(self):
         """
@@ -108,6 +136,8 @@ class RandomBoardTicTacToe:
         terminal = self.game_state.is_terminal()
         """ USE self.game_state.get_scores(terminal) HERE TO COMPUTE AND DISPLAY THE FINAL SCORES """
 
+
+
     def game_reset(self):
         self.draw_game()
         """
@@ -119,7 +149,9 @@ class RandomBoardTicTacToe:
 
     def play_game(self, mode = "player_vs_ai"):
         done = False
+
         clock = pygame.time.Clock()
+
 
         while not done:
             for event in pygame.event.get():  # User did something
@@ -131,16 +163,26 @@ class RandomBoardTicTacToe:
                 YOUR CODE HERE TO HANDLE THE SITUATION IF THE GAME IS OVER. IF THE GAME IS OVER THEN DISPLAY THE SCORE,
                 THE WINNER, AND POSSIBLY WAIT FOR THE USER TO CLEAR THE BOARD AND START THE GAME AGAIN (OR CLICK EXIT)
                 """
+                    
                 if event.type == pygame.QUIT:
                     done = True
+
                 """
                 YOUR CODE HERE TO NOW CHECK WHAT TO DO IF THE GAME IS NOT OVER AND THE USER SELECTED A NON EMPTY CELL
                 IF CLICKED A NON EMPTY CELL, THEN GET THE X,Y POSITION, SET ITS VALUE TO 1 (SELECTED BY HUMAN PLAYER),
                 DRAW CROSS (OR NOUGHT DEPENDING ON WHICH SYMBOL YOU CHOSE FOR YOURSELF FROM THE gui) AND CALL YOUR 
                 PLAY_AI FUNCTION TO LET THE AGENT PLAY AGAINST YOU
                 """
-                
-                # if event.type == pygame.MOUSEBUTTONUP:
+                    
+                if event.type == pygame.MOUSEBUTTONUP:
+                    location = pygame.mouse.get_pos()
+                    # Only detect inside the bounds of the grid
+                    if (not location[0] >= 50 * self.GRID_SIZE + 50 and not location[0] <= 50 and not location[1] >= 50 * self.GRID_SIZE + 50 and not location[1] <= 50):
+                        # Finds the center point onf the grid cell the mouse clicked
+                        self.draw_circle(floor((location[0] - 50) / 50) * 50 + 75, floor((location[1] - 50) / 50) * 50 + 75 )
+                    
+
+                    # If we decide to not make cells the set size of 50 pixels, we'll need a private data member for it
                     # Get the position
                     
                     # Change the x/y screen coordinates to grid coordinates
@@ -156,7 +198,6 @@ class RandomBoardTicTacToe:
         pygame.quit()
 
 tictactoegame = RandomBoardTicTacToe()
-tictactoegame.play_game()
 """
 YOUR CODE HERE TO SELECT THE OPTIONS VIA THE GUI CALLED FROM THE ABOVE LINE
 AFTER THE ABOVE LINE, THE USER SHOULD SELECT THE OPTIONS AND START THE GAME. 
