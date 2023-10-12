@@ -24,16 +24,17 @@ from multiAgents import minimax, negamax
 import sys, random
 
 
+class SpaceState(Enum):
+    EMPTY = 0
+    CIRCLE = 1
+    CROSS = -1
 
 class BoardSpace:
     def __init__(self,x ,y):
         self.x = x
         self.y = y
         # these variables act as an Enumerator for possible Cell States.
-        self.EMPTY = 0
-        self.CIRCLE = 1
-        self.CROSS = -1
-        self.value = self.EMPTY
+        self.state = SpaceState.EMPTY
         self.checkedDirections = {False, False, False, False, False, False, False, False}
     
         
