@@ -14,6 +14,8 @@ PLEASE READ THE COMMENTS BELOW AND THE HOMEWORK DESCRIPTION VERY CAREFULLY BEFOR
  PLEASE CAREFULLY SEE THE PORTIONS OF THE CODE/FUNCTIONS WHERE IT INDICATES "YOUR CODE BELOW" TO COMPLETE THE SECTIONS
  
 """
+from decimal import FloatOperation
+from math import floor
 import pygame
 import numpy as np
 from GameStatus_5120 import GameStatus
@@ -173,9 +175,13 @@ class RandomBoardTicTacToe:
                     
                 if event.type == pygame.MOUSEBUTTONUP:
                     location = pygame.mouse.get_pos()
-                    
+                    # Only detect inside the bounds of the grid
+                    if (not location[0] >= 50 * self.GRID_SIZE + 50 and not location[0] <= 50 and not location[1] >= 50 * self.GRID_SIZE + 50 and not location[1] <= 50):
+                        # Finds the center point onf the grid cell the mouse clicked
+                        self.draw_circle(floor((location[0] - 50) / 50) * 50 + 75, floor((location[1] - 50) / 50) * 50 + 75 )
                     
 
+                    # If we decide to not make cells the set size of 50 pixels, we'll need a private data member for it
                     # Get the position
                     
                     # Change the x/y screen coordinates to grid coordinates
