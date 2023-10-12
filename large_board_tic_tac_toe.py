@@ -75,13 +75,12 @@ class RandomBoardTicTacToe:
         """
         YOUR CODE HERE TO DRAW THE GRID OTHER CONTROLS AS PART OF THE GUI
         """
-        pygame.display.flip();
-        
         for x in range(0,self.GRID_SIZE):
             for y in range(0,self.GRID_SIZE):
                 pygame.draw.rect(self.screen,self.WHITE,(50 * x +50,50 * y + 50,50,50),2)
+
+        pygame.display.flip();
         
-        self.play_game()
 
     def change_turn(self):
 
@@ -192,6 +191,7 @@ class RandomBoardTicTacToe:
         pygame.quit()
 
 tictactoegame = RandomBoardTicTacToe()
+tictactoegame.play_game()
 """
 YOUR CODE HERE TO SELECT THE OPTIONS VIA THE GUI CALLED FROM THE ABOVE LINE
 AFTER THE ABOVE LINE, THE USER SHOULD SELECT THE OPTIONS AND START THE GAME. 
