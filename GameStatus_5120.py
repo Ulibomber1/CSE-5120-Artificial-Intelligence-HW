@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from enum import Enum
 
 class SpaceState(Enum):
     EMPTY = 0
@@ -17,7 +17,7 @@ class BoardSpace:
 class GameStatus:
 	def __init__(self, board_state, turn_O):
 
-		self.board_state = board_state # should be a 2D array[row][column]
+		self.board_state = board_state # should be a 2d list (matrix)
 		self.turn_O = turn_O
 		self.oldScores = 0
 		self.winner = ""
@@ -56,36 +56,37 @@ class GameStatus:
 		check_point = 3 if terminal else 2
 
 		# directions are grouped according to opposing directions
-		directions = [((1,0),(-1,0)),
+		directionPairs = [((1,0),(-1,0)),
 					  ((0,1),(0,-1)),
 					  ((1,1),(-1,-1)),
 					  ((-1,1),(1,-1))]
 
 		scoring_sequences: dict = [] # triple tuples (x,y), w/ value
 
-		# this feels like a code smell... so many tabs
+		# this feels like a code smell... so many tabs, really long statements
 		for row in range(rows):
 			for col in range(cols):
-				origin_state = self.board_state[row][column].state
+				origin_state = self.board_state[row][column]
 
 				if origin_state == 0:
 					break
 
-				for direction in directions:
-					accumulatedSequence = [(column, row)]
-					try:
-						if origin_state == self.board_state[row + direction[0][1]][col + direction[0][0]]:
-							accumulatedSequence.append((row + direction[0][1], col + direction[0][0]))
-							if origin_state == self.board_state[row + (2 *direction[0][1])][col + (2 * direction[0][0])]:
-								accumulatedSequence.append((row + (2 * direction[0][1]), col + (2 * direction[0][0])))
-					try:
-						if len(accumulatedSequence) < 3 and origin_state == self.board_state[row + direction[1][1]][col + direction[1][0]]:
-							accumulatedSequence.append((row + direction[1][1], col + direction[1][0]))
-							if len(accumulatedSequence) < 3 and origin_state == self.board_state[row + (2 * direction[1][1])][col + (2 * direction[1][0])]:
-								accumulatedSequence.append((row + (2 * direction[1][1]), col + (2 * direction[1][0])))
-					if len(accumulatedSequence) == 3 and scoring_sequences.get(accumulatedSequence, false) == false:
-						scoring_sequences[accumulated_sequence] = origin_state
-						scores += 1 if origin_state == 1 else -1
+				accumulatedSequence = [(col, row)]
+
+				for directionPair in directionPairs:
+					for direction in directionPair:
+						try:
+							if len(accumulatedSequence) < 3 and origin_state == self.board_state[row + direction[1]][col + direction[0]]:
+								accumulatedSequence.append((row + direction[1], col + direction[0]))
+								if len(accumulatedSequence) < 3 and origin_state == self.board_state[row + (2 *direction[1])][col + (2 * direction[0])]:
+									accumulatedSequence.append((row + (2 * direction[1]), col + (2 * direction[0])))
+						except:
+							pass
+				if len(accumulatedSequence) == 3 and scoring_sequences.get(accumulatedSequence, false) == false:
+					scoring_sequences[accumulated_sequence] = origin_state
+					scores += 1 if origin_state == 1 else -1
+
+		return scores
 
 		
 
@@ -103,11 +104,19 @@ class GameStatus:
 
 
 	def get_moves(self):
-		moves = []
+		moves: dict = [] # dictionary for iterability and constant lookup time; no ordering property is necessary
+		rows = len(self.board_state)
+		cols = len(self.board_state[0])
 		"""
         YOUR CODE HERE TO ADD ALL THE NON EMPTY CELLS TO MOVES VARIABLES AND RETURN IT TO BE USE BY YOUR
         MINIMAX OR NEGAMAX FUNCTIONS
         """
+		for row in range(rows):
+			for col in range(cols):
+				value = self.board_state[row][col]
+				if self.board_state[row][col] == 0:
+					break
+				moves.update({(col, row): value}) # like (x,y): (int between -1 to 1)
 		return moves
 
 	# Changed to mutating function since copies may cause unintended behavior 
