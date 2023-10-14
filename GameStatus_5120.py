@@ -1,15 +1,25 @@
 # -*- coding: utf-8 -*-
 
 
+class SpaceState(Enum):
+    EMPTY = 0
+    CIRCLE = 1
+    CROSS = -1
+
+class BoardSpace:
+    def __init__(self,x ,y):
+        self.x = x
+        self.y = y
+
+        # acts as an Enumerator for possible Cell States.
+        self.state = SpaceState.EMPTY
+
 class GameStatus:
-
-
 	def __init__(self, board_state, turn_O):
 
-		self.board_state = board_state
+		self.board_state = board_state # should be a 2D array[row][column]
 		self.turn_O = turn_O
 		self.oldScores = 0
-
 		self.winner = ""
 
 

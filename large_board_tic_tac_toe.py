@@ -22,25 +22,10 @@ import numpy as np
 from GameStatus_5120 import GameStatus
 from multiAgents import minimax, negamax
 import sys, random
-
-
-class SpaceState(Enum):
-    EMPTY = 0
-    CIRCLE = 1
-    CROSS = -1
-
-class BoardSpace:
-    def __init__(self,x ,y):
-        self.x = x
-        self.y = y
-        # these variables act as an Enumerator for possible Cell States.
-        self.state = SpaceState.EMPTY
-        self.checkedDirections = {False, False, False, False, False, False, False, False}
     
-        
-
 
 mode = "player_vs_ai" # default mode for playing the game (player vs AI)
+
 
 class RandomBoardTicTacToe:
     def __init__(self, size = (600, 600)):
@@ -54,7 +39,7 @@ class RandomBoardTicTacToe:
 
         # Grid Size
         self.GRID_SIZE = 4
-        self. OFFSET = 5
+        self.OFFSET = 5
 
         self.CIRCLE_COLOR = (140, 146, 172)
         self.CROSS_COLOR = (140, 146, 172)
