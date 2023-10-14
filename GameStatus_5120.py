@@ -45,34 +45,36 @@ class GameStatus:
 		scores = 0
 		check_point = 3 if terminal else 2
 
+		# directions are grouped according to opposing directions
+		directions = [((1,0),(-1,0)),
+					  ((0,1),(0,-1)),
+					  ((1,1),(-1,-1)),
+					  ((-1,1),(1,-1))]
 
+		scoring_sequences: dict = [] # triple tuples (x,y), w/ value
+
+		# this feels like a code smell... so many tabs
 		for row in range(rows):
 			for col in range(cols):
 				origin_state = self.board_state[row][column].state
 
 				if origin_state == 0:
 					break
-				scoring_sequences = []
 
-				# directions are grouped according to opposing directions
-				directions = [((1,0),(-1,0)),
-							  ((0,1),(0,-1)),
-							  ((1,1),(-1,-1)),
-							  ((-1,1),(1,-1))]
-				
 				for direction in directions:
 					accumulatedSequence = [(column, row)]
 					try:
-						if origin_state == self.board_state[row + direction[0][1]][col + direction[0][0]].state:
+						if origin_state == self.board_state[row + direction[0][1]][col + direction[0][0]]:
 							accumulatedSequence.append((row + direction[0][1], col + direction[0][0]))
-							if origin_state == self.board_state[row + (2 *direction[0][1])][col + (2 * direction[0][0])].state:
+							if origin_state == self.board_state[row + (2 *direction[0][1])][col + (2 * direction[0][0])]:
 								accumulatedSequence.append((row + (2 * direction[0][1]), col + (2 * direction[0][0])))
 					try:
-						if len(accumulatedSequence) < 3 and origin_state == self.board_state[row + direction[1][1]][col + direction[1][0]].state:
+						if len(accumulatedSequence) < 3 and origin_state == self.board_state[row + direction[1][1]][col + direction[1][0]]:
 							accumulatedSequence.append((row + direction[1][1], col + direction[1][0]))
-							if accumulatedSequence < 3 and origin_state == self.board_state[row + (2 * direction[1][1])][col + (2 * direction[1][0])].state:
+							if len(accumulatedSequence) < 3 and origin_state == self.board_state[row + (2 * direction[1][1])][col + (2 * direction[1][0])]:
 								accumulatedSequence.append((row + (2 * direction[1][1]), col + (2 * direction[1][0])))
-					if accumulatedSequence == 3:
+					if len(accumulatedSequence) == 3 and scoring_sequences.get(accumulatedSequence, false) == false:
+						scoring_sequences[accumulated_sequence] = origin_state
 						scores += 1 if origin_state == 1 else -1
 
 		
@@ -98,9 +100,11 @@ class GameStatus:
         """
 		return moves
 
-
+	# Changed to mutating function since copies may cause unintended behavior 
+	# and use more memory than necessary (based on OOP principles)
 	def get_new_state(self, move):
 		new_board_state = self.board_state.copy()
 		x, y = move[0], move[1]
-		new_board_state[x,y] = 1 if self.turn_O else -1
-		return GameStatus(new_board_state, not self.turn_O)
+		new_board_state[x][y] = 1 if self.turn_O else -1
+		self.board_state = new_board_state 
+		self.turn_O = not turn_O 
