@@ -14,7 +14,6 @@ PLEASE READ THE COMMENTS BELOW AND THE HOMEWORK DESCRIPTION VERY CAREFULLY BEFOR
  PLEASE CAREFULLY SEE THE PORTIONS OF THE CODE/FUNCTIONS WHERE IT INDICATES "YOUR CODE BELOW" TO COMPLETE THE SECTIONS
  
 """
-from enum import Enum
 from decimal import FloatOperation
 from math import floor
 import pygame
@@ -73,10 +72,10 @@ class RandomBoardTicTacToe:
         for x in range(0,self.GRID_SIZE):
             for y in range(0,self.GRID_SIZE):
                 pygame.draw.rect(self.screen,self.WHITE,(50 * x +50,50 * y + 50,50,50),2)
-
+                # add logic here for drawing
         pygame.display.flip();
         
-
+    # changes the active turn on the UI, but not the boolean in backend
     def change_turn(self):
 
         if(self.game_state.turn_O):
@@ -136,7 +135,11 @@ class RandomBoardTicTacToe:
         YOUR CODE HERE TO RESET THE BOARD TO VALUE 0 FOR ALL CELLS AND CREATE A NEW GAME STATE WITH NEWLY INITIALIZED
         BOARD STATE
         """
+         # Initialize a GameStatus instance
+        board = [[0] * self.GRID_SIZE] * self.GRID_SIZE
+        self.game_state = GameStatus(board, True) # true while the logic for choosing which player (cross/circle) is which is WIP
         
+
         pygame.display.update()
 
     def play_game(self, mode = "player_vs_ai"):
