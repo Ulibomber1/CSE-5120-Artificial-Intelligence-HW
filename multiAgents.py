@@ -52,31 +52,3 @@ def negamax(game_status: GameStatus, depth: int, turn_multiplier: int, alpha=flo
 			break # prune the branch that will never be considered
 
 	return value, best_move
-
-
-boardState = [[ 0, 0, 0, 0], 
-			  [-1, 0, 1, 0],
-			  [ 1, 1,-1, 0],
-			  [ 0, 0, 0, 0]]
-
-gameStatus = GameStatus(boardState, False)
-
-value , move = negamax(gameStatus, 2, -1)
-print("Value:" + str(value))
-print("Best Move:" + str(move))
-
-value , move = negamax(gameStatus, 3, -1)
-print("Value:" + str(value))
-print("Best Move:" + str(move))
-
-value , move = negamax(gameStatus, 4, -1)
-print("Value:" + str(value))
-print("Best Move:" + str(move))
-
-value , move = negamax(gameStatus, 5, -1)
-print("Value:" + str(value))
-print("Best Move:" + str(move))
-
-value , move = negamax(gameStatus, 6, -1)
-print("Value:" + str(value))
-print("Best Move:" + str(move))
