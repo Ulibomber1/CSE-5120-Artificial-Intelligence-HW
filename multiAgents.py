@@ -1,21 +1,33 @@
 from GameStatus_5120 import GameStatus
 
 
+"""
+YOUR CODE HERE TO FIRST CHECK WHICH PLAYER HAS CALLED THIS FUNCTION (MAXIMIZING OR MINIMIZING PLAYER)
+YOU SHOULD THEN IMPLEMENT MINIMAX WITH ALPHA-BETA PRUNING AND RETURN THE FOLLOWING TWO ITEMS
+1. VALUE
+2. BEST_MOVE
+    
+THE LINE TO RETURN THESE TWO IS COMMENTED BELOW WHICH YOU CAN USE
+"""
 def minimax(game_state: GameStatus, depth: int, maximizingPlayer: bool, alpha=float('-inf'), beta=float('inf')):
 	terminal = game_state.is_terminal()
 	if (depth==0) or (terminal):
 		newScores = game_state.get_scores(terminal)
 		return newScores, None
+	moves: list = game_status.get_moves()
+	best_move = None
 
-	"""
-    YOUR CODE HERE TO FIRST CHECK WHICH PLAYER HAS CALLED THIS FUNCTION (MAXIMIZING OR MINIMIZING PLAYER)
-    YOU SHOULD THEN IMPLEMENT MINIMAX WITH ALPHA-BETA PRUNING AND RETURN THE FOLLOWING TWO ITEMS
-    1. VALUE
-    2. BEST_MOVE
-    
-    THE LINE TO RETURN THESE TWO IS COMMENTED BELOW WHICH YOU CAN USE
-    """
+	if maximizingPlayer:
+		value = float('-inf')
+		for move in moves:
+			newGameStatus = game_status.get_new_state(move)
+			miniMaxReturn, next_best_move = max(value, minimax(newGameStatus, depth - 1, False, alpha, beta))
+			if miniMaxReturn > beta:
+				break
+			alpha = max(alpha, miniMaxReturn)
+		return 
 
+	
 	# return value, best_move
 
 """
