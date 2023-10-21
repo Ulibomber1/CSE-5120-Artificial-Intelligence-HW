@@ -80,6 +80,9 @@ def negamax(game_status: GameStatus, depth: int, turn_multiplier: int, alpha=flo
 
 	return value, best_move
 
+
+# You can use this to debug until the GUI is fully functional
+"""
 boardState = [[-1,-1, 1,-1], 
 			  [ 1,-1,-1,-1],
 			  [ 1,-1, 1,-1],
@@ -108,3 +111,4 @@ print("Best Move:" + str(move))
 value , move = minimax(gameStatus, 6, False)
 print("Value:" + str(value))
 print("Best Move:" + str(move))
+"""
