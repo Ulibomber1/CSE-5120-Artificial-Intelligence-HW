@@ -179,3 +179,8 @@ class GameStatus:
 		x, y = move[1], move[0]
 		new_board_state[x][y] = 1 if self.turn_O else -1
 		return GameStatus(new_board_state, not self.turn_O)
+
+	def set_new_state(self, move):
+		x, y = move[1], move[0]
+		self.board_state[x][y] = 1 if self.turn_O else -1
+		
