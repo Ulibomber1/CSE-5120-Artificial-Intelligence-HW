@@ -14,21 +14,36 @@ def minimax(game_state: GameStatus, depth: int, maximizingPlayer: bool, alpha=fl
 	if (depth==0) or (terminal):
 		newScores = game_state.get_scores(terminal)
 		return newScores, None
-	moves: list = game_status.get_moves()
+	moves: list = game_state.get_moves()
 	best_move = None
 
 	if maximizingPlayer:
 		value = float('-inf')
 		for move in moves:
-			newGameStatus = game_status.get_new_state(move)
-			miniMaxReturn, next_best_move = max(value, minimax(newGameStatus, depth - 1, False, alpha, beta))
-			if miniMaxReturn > beta:
-				break
-			alpha = max(alpha, miniMaxReturn)
-		return 
+			newGameStatus = game_state.get_new_state(move)
+			minimaxReturn, next_best_move = minimax(newGameStatus, depth - 1, False, alpha, beta)
 
-	
-	# return value, best_move
+			if minimaxReturn > value:
+				value = minimaxReturn
+				best_move = move
+			if value > beta:
+				break
+			alpha = max(alpha, value)
+	else:
+		value = float('inf')
+		for move in moves:
+			newGameStatus = game_state.get_new_state(move)
+			minimaxReturn, next_best_move = minimax(newGameStatus, depth - 1, True, alpha, beta)
+
+			if minimaxReturn < value:
+				value = minimaxReturn
+				best_move = move
+			if value < alpha:
+				break
+			beta = min(beta, value)
+
+	return value, best_move
+
 
 """
 YOUR CODE HERE TO CALL NEGAMAX FUNCTION. REMEMBER THE RETURN OF THE NEGAMAX SHOULD BE THE OPPOSITE OF THE CALLING
@@ -64,3 +79,32 @@ def negamax(game_status: GameStatus, depth: int, turn_multiplier: int, alpha=flo
 			break # prune the branch that will never be considered
 
 	return value, best_move
+
+boardState = [[-1,-1, 1,-1], 
+			  [ 1,-1,-1,-1],
+			  [ 1,-1, 1,-1],
+			  [ 1, 1, 1, 1]]
+
+gameStatus = GameStatus(boardState, False)
+gameStatus.oldScores = gameStatus.get_scores(True)
+print("Score:" + str(gameStatus.oldScores))
+
+value , move = minimax(gameStatus, 2, False)
+print("Value:" + str(value))
+print("Best Move:" + str(move))
+
+value , move = minimax(gameStatus, 3, False)
+print("Value:" + str(value))
+print("Best Move:" + str(move))
+
+value , move = minimax(gameStatus, 4, False)
+print("Value:" + str(value))
+print("Best Move:" + str(move))
+
+value , move = minimax(gameStatus, 5, False)
+print("Value:" + str(value))
+print("Best Move:" + str(move))
+
+value , move = minimax(gameStatus, 6, False)
+print("Value:" + str(value))
+print("Best Move:" + str(move))
