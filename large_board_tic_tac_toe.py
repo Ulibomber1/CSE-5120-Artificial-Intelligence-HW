@@ -14,7 +14,6 @@ PLEASE READ THE COMMENTS BELOW AND THE HOMEWORK DESCRIPTION VERY CAREFULLY BEFOR
  PLEASE CAREFULLY SEE THE PORTIONS OF THE CODE/FUNCTIONS WHERE IT INDICATES "YOUR CODE BELOW" TO COMPLETE THE SECTIONS
  
 """
-from decimal import FloatOperation
 from math import floor
 import pygame
 import numpy as np
@@ -37,8 +36,8 @@ class RandomBoardTicTacToe:
         self.RED = (255, 0, 0)
 
         # Grid Size
-        self.GRID_SIZE = 4
-        self.OFFSET = 5
+        self.GRID_SIZE = 7
+        self.OFFSET = 10
 
         self.CIRCLE_COLOR = (140, 146, 172)
         self.CROSS_COLOR = (140, 146, 172)
@@ -53,13 +52,19 @@ class RandomBoardTicTacToe:
         # This is for menus before starting the game.
         self.gameStarted = False
 
+        # This is for storing and interpreting board changes
+        self.board:dict = { (i,j):0 for i in range(self.GRID_SIZE) for j in range(self.GRID_SIZE) }
+        self.game_state = GameStatus(self.board, True, self.GRID_SIZE)
+
         # Initialize pygame
         pygame.init()
         self.game_reset()
 
     def draw_game(self):
-        # Create a 2 dimensional array using the column and row variables
+        
         pygame.init()
+        
+        
         self.screen = pygame.display.set_mode(self.size)
         pygame.display.set_caption("Tic Tac Toe Random Grid")
         self.screen.fill(self.BLACK)
@@ -69,9 +74,12 @@ class RandomBoardTicTacToe:
         """
         YOUR CODE HERE TO DRAW THE GRID OTHER CONTROLS AS PART OF THE GUI
         """
+        # add ai choice here or after game start
+        # Add control for selecting ai search type       
+
         for x in range(0,self.GRID_SIZE):
             for y in range(0,self.GRID_SIZE):
-                pygame.draw.rect(self.screen,self.WHITE,(50 * x +50,50 * y + 50,50,50),2)
+                pygame.draw.rect(self.screen,self.WHITE,(self.WIDTH * x + self.OFFSET/2, self.HEIGHT * y + self.OFFSET, self.WIDTH + self.MARGIN, self.HEIGHT + self.MARGIN), self.MARGIN)
                 # add logic here for drawing
         pygame.display.flip();
         
@@ -89,14 +97,15 @@ class RandomBoardTicTacToe:
         YOUR CODE HERE TO DRAW THE CIRCLE FOR THE NOUGHTS PLAYER
         """
         
-        pygame.draw.circle(self.screen, self.WHITE, (x, y), 15, 4)
+        pygame.draw.circle(self.screen, self.WHITE, (x, y), (self.WIDTH / 2 * 0.80) * 0.90, self.MARGIN)
 
     def draw_cross(self, x, y):
         """
         YOUR CODE HERE TO DRAW THE CROSS FOR THE CROSS PLAYER AT THE CELL THAT IS SELECTED VIA THE gui
         """
-        pygame.draw.line(self.screen, self.WHITE, (x - 15, y - 15), (x + 15, y + 15), 3)
-        pygame.draw.line(self.screen, self.WHITE, (x - 15, y + 15), (x + 15, y - 15), 3)
+        # Locates the center point of the cell and draws a cross
+        pygame.draw.line(self.screen, self.WHITE, (x - self.WIDTH / 2 * 0.6, y - self.HEIGHT / 2 * 0.6), (x + self.WIDTH / 2 * 0.6, y + self.HEIGHT / 2 * 0.6), self.MARGIN)
+        pygame.draw.line(self.screen, self.WHITE, (x - self.WIDTH / 2 * 0.6, y + self.HEIGHT / 2 * 0.6), (x + self.WIDTH / 2 * 0.6, y - self.HEIGHT / 2 * 0.6), self.MARGIN)
 
     def is_game_over(self):
 
@@ -105,11 +114,13 @@ class RandomBoardTicTacToe:
         FUNCTION FROM GAMESTATUS_5120.PY FILE (YOU WILL FIRST NEED TO COMPLETE IS_TERMINAL() FUNCTION)
         
         YOUR RETURN VALUE SHOULD BE TRUE OR FALSE TO BE USED IN OTHER PARTS OF THE GAME
-        """
-    
+        """       
+
+        return self.game_state.is_terminal()
 
     def move(self, move):
-        self.game_state = self.game_state.get_new_state(move)
+        self.game_state.set_new_state(move)
+        self.game_state.turn_O = not self.game_state.turn_O
 
 
     def play_ai(self):
@@ -121,7 +132,11 @@ class RandomBoardTicTacToe:
         THE RETURN VALUES FROM YOUR MINIMAX/NEGAMAX ALGORITHM SHOULD BE THE SCORE, MOVE WHERE SCORE IS AN INTEGER
         NUMBER AND MOVE IS AN X,Y LOCATION RETURNED BY THE AGENT
         """
-        
+        if self.game_state.is_terminal():
+            return
+        value, location = minimax(self.game_state, 2, self.game_state.turn_O)
+        self.move(location)
+        self.draw_cross(location[0] * self.WIDTH + self.WIDTH * 0.5 + self.OFFSET, location[1] * self.HEIGHT + self.HEIGHT * 0.5 + self.OFFSET)
         self.change_turn()
         pygame.display.update()
         terminal = self.game_state.is_terminal()
@@ -136,8 +151,8 @@ class RandomBoardTicTacToe:
         BOARD STATE
         """
          # Initialize a GameStatus instance
-        board = [[0] * self.GRID_SIZE] * self.GRID_SIZE
-        self.game_state = GameStatus(board, True) # true while the logic for choosing which player (cross/circle) is which is WIP
+        board = { (i,j):0 for i in range(self.GRID_SIZE) for j in range(self.GRID_SIZE) }
+        self.game_state = GameStatus(board, True, self.GRID_SIZE) # true while the logic for choosing which player (cross/circle) is which is WIP
         
 
         pygame.display.update()
@@ -169,13 +184,34 @@ class RandomBoardTicTacToe:
                 PLAY_AI FUNCTION TO LET THE AGENT PLAY AGAINST YOU
                 """
                     
-                if event.type == pygame.MOUSEBUTTONUP:
+                if event.type == pygame.MOUSEBUTTONUP and self.game_state.turn_O:
+                    
+                    
+
                     location = pygame.mouse.get_pos()
                     # Only detect inside the bounds of the grid
-                    if (not location[0] >= 50 * self.GRID_SIZE + 50 and not location[0] <= 50 and not location[1] >= 50 * self.GRID_SIZE + 50 and not location[1] <= 50):
-                        # Finds the center point onf the grid cell the mouse clicked
-                        self.draw_circle(floor((location[0] - 50) / 50) * 50 + 75, floor((location[1] - 50) / 50) * 50 + 75 )
+                    if (not location[0] >= self.WIDTH * self.GRID_SIZE + self.MARGIN and not location[0] <= self.OFFSET and not location[1] >= self.HEIGHT * self.GRID_SIZE + self.MARGIN and not location[1] <= self.OFFSET):
+                        # Converts the coordinates of the mouse into the row and column in the board array
+                        cellX = floor((location[0] - self.MARGIN) / self.WIDTH)
+                        cellY = floor((location[1] - self.MARGIN) / self.HEIGHT)
+                        if self.game_state.board_state[(cellX, cellY)] == 0 and self.game_state.turn_O:
+                            # Finds the center point of the grid cell the mouse clicked
+                            self.draw_circle(cellX * self.WIDTH + self.WIDTH * 0.5 + self.OFFSET, cellY * self.HEIGHT + self.HEIGHT * 0.5 + self.OFFSET )
+                            self.move((cellX, cellY))
+                            print(self.game_state.board_state)
+                            print('\n')
+                            self.play_ai()
                     
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_r:
+                        for i in range(self.GRID_SIZE):
+                            for j in range(self.GRID_SIZE):
+                                if self.game_state.board_state[(i, j)] == 1:
+                                    self.draw_circle(i * self.WIDTH + self.WIDTH * 0.5 + self.OFFSET, j * self.HEIGHT + self.HEIGHT * 0.5 + self.OFFSET )
+                                elif self.game_state.board_state[(i, j)] == -1:
+                                    self.draw_cross(i * self.WIDTH + self.WIDTH * 0.5 + self.OFFSET, j * self.HEIGHT + self.HEIGHT * 0.5 + self.OFFSET)
+
 
                     # If we decide to not make cells the set size of 50 pixels, we'll need a private data member for it
                     # Get the position
