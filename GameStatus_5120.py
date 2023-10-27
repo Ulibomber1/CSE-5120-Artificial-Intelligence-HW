@@ -8,30 +8,28 @@ class SpaceState(Enum):
     CROSS = -1
 
 class BoardSpace:
-    def __init__(self,x ,y):
-        self.x = x
-        self.y = y
-
+    def __init__(self):
+        
         # acts as an Enumerator for possible Cell States.
         self.state = SpaceState.EMPTY
 
 class GameStatus:
-	def __init__(self, board_state, turn_O):
+	def __init__(self, board_state, turn_O, length):
 
-		self.board_state = board_state # should be a 2d list (matrix)
+		self.board_state:dict = board_state # should be a 2d list (matrix)
 		self.turn_O = turn_O
 		self.oldScores = 0
 		self.winner = ""
-
+		self.GRID_SIZE = length
 
 	def is_terminal(self):
 		"""
         YOUR CODE HERE TO CHECK IF ANY CELL IS EMPTY WITH THE VALUE 0. IF THERE IS NO EMPTY
         THEN YOU SHOULD ALSO RETURN THE WINNER OF THE GAME BY CHECKING THE SCORES FOR EACH PLAYER 
         """
-		for row in range(len(self.board_state)):
-			for column in range(len(self.board_state[row])):
-				if self.board_state[row][column] == 0:
+		for row in range(self.GRID_SIZE):
+			for column in range(self.GRID_SIZE):
+				if self.board_state[(row,column)] == 0:
 					return False
 
 		if self.oldScores == 0:
@@ -52,8 +50,8 @@ class GameStatus:
         NEGATIVE (AI PLAYER WINS), OR 0 (DRAW)
         """   
 		
-		rows = len(self.board_state)
-		cols = len(self.board_state[0])
+		rows = self.GRID_SIZE
+		cols = self.GRID_SIZE
 		scores = 0
 		check_point = 3 if terminal else 2
 		
@@ -69,7 +67,7 @@ class GameStatus:
 		for row in range(rows):
 			for col in range(cols):
 
-				origin_state = self.board_state[row][col]
+				origin_state = self.board_state[row,col]
 				if origin_state == 0:
 					break
 
@@ -81,14 +79,14 @@ class GameStatus:
 						try:
 							if row + direction[1] < 0 or col + direction[0] < 0:
 								continue
-							if origin_state == self.board_state[row + direction[1]][col + direction[0]]:
+							if origin_state == self.board_state[(row + direction[1], col + direction[0])]:
 								accumulatedSequence.append((col + direction[0], row + direction[1]))
 								if row + (2 * direction[1]) < 0 or col + (2 * direction[0]) < 0:
 									continue
-								if len(accumulatedSequence) < 3 and origin_state == self.board_state[row + (2 *direction[1])][col + (2 * direction[0])]:
+								if len(accumulatedSequence) < 3 and origin_state == self.board_state[row + (2 *direction[1]),col + (2 * direction[0])]:
 									accumulatedSequence.append((col + (2 * direction[0]), row + (2 * direction[1])))
 									break
-						except IndexError:
+						except :
 							pass
 
 					if len(accumulatedSequence) != 3:
@@ -109,8 +107,8 @@ class GameStatus:
     """
 	def get_negamax_scores(self, terminal):
 
-		rows = len(self.board_state)
-		cols = len(self.board_state[0])
+		rows = self.GRID_SIZE
+		cols = self.GRID_SIZE
 		scores = 0
 		check_point = 3 if terminal else 2
 		
@@ -126,7 +124,7 @@ class GameStatus:
 		for row in range(rows):
 			for col in range(cols):
 
-				origin_state = self.board_state[row][col]
+				origin_state = self.board_state[row,col]
 				if origin_state == 0:
 					break
 
@@ -138,11 +136,11 @@ class GameStatus:
 						try:
 							if row + direction[1] < 0 or col + direction[0] < 0:
 								continue
-							if origin_state == self.board_state[row + direction[1]][col + direction[0]]:
+							if origin_state == self.board_state[row + direction[1],col + direction[0]]:
 								accumulatedSequence.append((col + direction[0], row + direction[1]))
 								if row + (2 * direction[1]) < 0 or col + (2 * direction[0]) < 0:
 									continue
-								if len(accumulatedSequence) < 3 and origin_state == self.board_state[row + (2 *direction[1])][col + (2 * direction[0])]:
+								if len(accumulatedSequence) < 3 and origin_state == self.board_state[row + (2 *direction[1]),col + (2 * direction[0])]:
 									accumulatedSequence.append((col + (2 * direction[0]), row + (2 * direction[1])))
 									break
 						except IndexError:
@@ -159,16 +157,16 @@ class GameStatus:
 
 	def get_moves(self):
 		moves: list = []
-		rows = len(self.board_state)
-		cols = len(self.board_state[0])
+		rows = self.GRID_SIZE
+		cols = self.GRID_SIZE
 		"""
         YOUR CODE HERE TO ADD ALL THE NON EMPTY CELLS TO MOVES VARIABLES AND RETURN IT TO BE USE BY YOUR
         MINIMAX OR NEGAMAX FUNCTIONS
         """
 		for row in range(rows):
 			for col in range(cols):
-				value = self.board_state[row][col]
-				if self.board_state[row][col] == 0:
+				value = self.board_state[col,row]
+				if self.board_state[col,row] == 0:
 					moves.append((col, row)) # like (x,y)
 		return moves
 	
@@ -176,12 +174,9 @@ class GameStatus:
 	# for the nodes in tree searches
 	def get_new_state(self, move):
 		new_board_state = deepcopy(self.board_state) # deep copy to prevent mutation
-		x, y = move[1], move[0]
-		new_board_state[x][y] = 1 if self.turn_O else -1
-		return GameStatus(new_board_state, not self.turn_O)
+		new_board_state[move] = 1 if self.turn_O else -1
+		return GameStatus(new_board_state, not self.turn_O, self.GRID_SIZE)
 
 	# for setting this instance's state
 	def set_new_state(self, move):
-		x, y = move[1], move[0]
-		self.board_state[x][y] = 1 if self.turn_O else -1
-		
+		self.board_state[move] = 1 if self.turn_O else -1
