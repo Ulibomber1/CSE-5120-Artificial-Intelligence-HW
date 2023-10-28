@@ -81,7 +81,7 @@ class RandomBoardTicTacToe:
 
         # Grid Size
         self.MIN_GRID_SIZE = 3
-        self.MAX_GRID_SIZE = 8
+        self.MAX_GRID_SIZE = 5
         self.GRID_SIZE = self.MIN_GRID_SIZE
         self.NEXT_GRID_SIZE = self.GRID_SIZE
    
@@ -192,9 +192,9 @@ class RandomBoardTicTacToe:
             return
         # Adversarial Search
         if self.isMinimax:
-            value, location = minimax(self.game_state, 2, self.game_state.turn_O)
+            value, location = minimax(self.game_state, 4, self.game_state.turn_O)
         else:
-            value, location = negamax(self.game_state, 2, -1)
+            value, location = negamax(self.game_state, 4, -1)
 
         self.move(location)
         self.draw_cross(location[0] * self.WIDTH + self.WIDTH * 0.5 + self.OFFSET, location[1] * self.HEIGHT + self.HEIGHT * 0.5 + self.OFFSET)
