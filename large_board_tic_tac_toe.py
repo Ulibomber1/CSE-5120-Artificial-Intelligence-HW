@@ -15,7 +15,6 @@ PLEASE READ THE COMMENTS BELOW AND THE HOMEWORK DESCRIPTION VERY CAREFULLY BEFOR
  
 """
 from math import floor
-import string
 from turtle import pos
 import pygame
 import numpy as np
@@ -27,7 +26,7 @@ import sys, random
 mode = "player_vs_ai" # default mode for playing the game (player vs AI)
 
 class Button:
-    def __init__(self, text:string, size:int, x:int, y:int, margin:int, color:tuple = (255, 255, 255), buttonColor:tuple = (173, 173, 173), buttonHighlight:tuple = (100, 50, 50)):
+    def __init__(self, text:str, size:int, x:int, y:int, margin:int, color:tuple = (255, 255, 255), buttonColor:tuple = (173, 173, 173), buttonHighlight:tuple = (100, 50, 50)):
         self.text = text
         self.font = pygame.font.Font("freesansbold.ttf", size)
         self.color = color
@@ -37,7 +36,7 @@ class Button:
         self.textBox = self.font.render(self.text, True, self.color, self.buttonColor)
         self.highlightTextBox = self.font.render(self.text, True, self.color, self.buttonHighlight)
         self.pos = (x,y)
-        self.rect = self.textBox.get_rect().inflate(self.margin,self.margin)
+        self.rect = self.textBox.get_rect().inflate(self.margin, self.margin)
         self.rect.topleft = (self.pos[0] - self.margin / 2, self.pos[1] - self.margin / 2 )
 
     # Return collision rectangle
@@ -51,10 +50,24 @@ class Button:
         else:
             pygame.draw.rect(screen,self.buttonColor,self.rect)
             screen.blit(self.textBox, self.pos)
-        
-        
-    
-    
+
+    def setText(self, text:str):
+        self.text = text
+        self.textBox = self.font.render(self.text, True, self.color, self.buttonColor)
+        self.highlightTextBox = self.font.render(self.text, True, self.color, self.buttonHighlight)
+        self.rect = self.textBox.get_rect().inflate(self.margin,self.margin)
+        self.rect.topleft = (self.pos[0] - self.margin / 2, self.pos[1] - self.margin / 2 )
+
+    def getText(self):
+        return self.text
+
+def clampNum(num, min, max):
+    if num < min:
+        return min
+    if num > max:
+        return max
+    return num
+
 
 class RandomBoardTicTacToe:
     def __init__(self, size = (600, 600)):
@@ -67,7 +80,11 @@ class RandomBoardTicTacToe:
         self.RED = (255, 0, 0)
 
         # Grid Size
-        self.GRID_SIZE = 7
+        self.MIN_GRID_SIZE = 3
+        self.MAX_GRID_SIZE = 8
+        self.GRID_SIZE = self.MIN_GRID_SIZE
+        self.NEXT_GRID_SIZE = self.GRID_SIZE
+   
         self.OFFSET = 10
 
         self.CIRCLE_COLOR = (140, 146, 172)
@@ -75,7 +92,7 @@ class RandomBoardTicTacToe:
 
         # This sets the WIDTH and HEIGHT of each grid location
         self.WIDTH = self.size[0]/self.GRID_SIZE - self.OFFSET
-        self.HEIGHT = self.size[1]/self.GRID_SIZE - self.OFFSET
+        self.HEIGHT = (self.size[1] - self.OFFSET * 12/self.GRID_SIZE)/self.GRID_SIZE - self.OFFSET
 
         # This sets the margin between each cell
         self.MARGIN = 5
@@ -91,7 +108,12 @@ class RandomBoardTicTacToe:
         pygame.init()
         
         # This is for GUI buttons
-        self.startButton = Button("Start", 18, self.OFFSET * 2, self.OFFSET * 4 + self.GRID_SIZE * self.HEIGHT, self.WHITE, 10, self.GREEN, self.RED)
+        self.startButton = Button("Start", 18, self.OFFSET * 2, self.OFFSET * 4 + self.GRID_SIZE * self.HEIGHT, 10, self.WHITE,  self.GREEN, self.RED)
+        self.searchTypeButton = Button("Minimax", 18, self.OFFSET * 8, self.OFFSET * 4 + self.GRID_SIZE * self.HEIGHT, 10, self.WHITE, self.GREEN, self.RED)
+        self.sizeUpButton = Button("Size Up", 18, self.OFFSET * 40, self.OFFSET * 4 + self.GRID_SIZE * self.HEIGHT, 10, self.WHITE, self.GREEN, self.RED)
+        self.sizeDownButton = Button("Size Down", 18, self.OFFSET * 48, self.OFFSET * 4 + self.GRID_SIZE * self.HEIGHT, 10, self.WHITE, self.GREEN, self.RED)
+
+        self.isMinimax: bool = True
 
         self.game_reset()
 
@@ -127,7 +149,6 @@ class RandomBoardTicTacToe:
         else:
             pygame.display.set_caption("Tic Tac Toe - X's turn")
 
-
     def draw_circle(self, x, y):
         """
         YOUR CODE HERE TO DRAW THE CIRCLE FOR THE NOUGHTS PLAYER
@@ -158,7 +179,6 @@ class RandomBoardTicTacToe:
         self.game_state.set_new_state(move)
         self.game_state.turn_O = not self.game_state.turn_O
 
-
     def play_ai(self):
         """
         YOUR CODE HERE TO CALL MINIMAX OR NEGAMAX DEPENDEING ON WHICH ALGORITHM SELECTED FROM THE GUI
@@ -170,7 +190,12 @@ class RandomBoardTicTacToe:
         """
         if self.game_state.is_terminal():
             return
-        value, location = minimax(self.game_state, 2, self.game_state.turn_O)
+        # Adversarial Search
+        if self.isMinimax:
+            value, location = minimax(self.game_state, 2, self.game_state.turn_O)
+        else:
+            value, location = negamax(self.game_state, 2, -1)
+
         self.move(location)
         self.draw_cross(location[0] * self.WIDTH + self.WIDTH * 0.5 + self.OFFSET, location[1] * self.HEIGHT + self.HEIGHT * 0.5 + self.OFFSET)
         self.change_turn()
@@ -178,19 +203,19 @@ class RandomBoardTicTacToe:
         terminal = self.game_state.is_terminal()
         """ USE self.game_state.get_scores(terminal) HERE TO COMPUTE AND DISPLAY THE FINAL SCORES """
 
-
-
     def game_reset(self):
-        self.draw_game()
         """
         YOUR CODE HERE TO RESET THE BOARD TO VALUE 0 FOR ALL CELLS AND CREATE A NEW GAME STATE WITH NEWLY INITIALIZED
         BOARD STATE
         """
+        self.GRID_SIZE = self.NEXT_GRID_SIZE
+        self.WIDTH = self.size[0]/self.GRID_SIZE - self.OFFSET
+        self.HEIGHT = (self.size[1] - self.OFFSET * 12/self.GRID_SIZE)/self.GRID_SIZE - self.OFFSET
          # Initialize a GameStatus instance
         board = { (i,j):0 for i in range(self.GRID_SIZE) for j in range(self.GRID_SIZE) }
         self.game_state = GameStatus(board, True, self.GRID_SIZE) # true while the logic for choosing which player (cross/circle) is which is WIP
         
-
+        self.draw_game()
         pygame.display.update()
 
     def play_game(self, mode = "player_vs_ai"):
@@ -219,12 +244,11 @@ class RandomBoardTicTacToe:
                 DRAW CROSS (OR NOUGHT DEPENDING ON WHICH SYMBOL YOU CHOSE FOR YOURSELF FROM THE gui) AND CALL YOUR 
                 PLAY_AI FUNCTION TO LET THE AGENT PLAY AGAINST YOU
                 """
-                    
+                
+                # Grid Interactions
                 if event.type == pygame.MOUSEBUTTONUP and self.game_state.turn_O:
-                    
-                    
-
                     location = pygame.mouse.get_pos()
+
                     # Only detect inside the bounds of the grid
                     if (not location[0] >= self.WIDTH * self.GRID_SIZE + self.MARGIN and not location[0] <= self.OFFSET and not location[1] >= self.HEIGHT * self.GRID_SIZE + self.MARGIN and not location[1] <= self.OFFSET):
                         # Converts the coordinates of the mouse into the row and column in the board array
@@ -237,8 +261,20 @@ class RandomBoardTicTacToe:
                             print(self.game_state.board_state)
                             print('\n')
                             self.play_ai()
-                    
+                
+                # Button Interactions
+                if event.type == pygame.MOUSEBUTTONUP:
+                    if self.startButton.GetRect().collidepoint(pygame.mouse.get_pos()):
+                        self.game_reset()
+                    if self.searchTypeButton.GetRect().collidepoint(pygame.mouse.get_pos()):
+                        self.isMinimax = not self.isMinimax
+                        self.searchTypeButton.setText("Minimax" if self.isMinimax else "Negamax")
+                    if self.sizeUpButton.GetRect().collidepoint(pygame.mouse.get_pos()):
+                        self.NEXT_GRID_SIZE = clampNum(self.NEXT_GRID_SIZE + 1, self.MIN_GRID_SIZE, self.MAX_GRID_SIZE)
+                    if self.sizeDownButton.GetRect().collidepoint(pygame.mouse.get_pos()):
+                        self.NEXT_GRID_SIZE = clampNum(self.NEXT_GRID_SIZE - 1, self.MIN_GRID_SIZE, self.MAX_GRID_SIZE)
 
+                # Refreshes the Screen (Debugging Functionality)
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
                         for i in range(self.GRID_SIZE):
@@ -248,11 +284,23 @@ class RandomBoardTicTacToe:
                                 elif self.game_state.board_state[(i, j)] == -1:
                                     self.draw_cross(i * self.WIDTH + self.WIDTH * 0.5 + self.OFFSET, j * self.HEIGHT + self.HEIGHT * 0.5 + self.OFFSET)
 
-
+                # Button Draws
                 if self.startButton.GetRect().collidepoint(pygame.mouse.get_pos()):
                     self.startButton.draw(self.screen, True)
                 else:
                     self.startButton.draw(self.screen, False)    
+                if self.searchTypeButton.GetRect().collidepoint(pygame.mouse.get_pos()):
+                    self.searchTypeButton.draw(self.screen, True)
+                else:
+                    self.searchTypeButton.draw(self.screen, False)
+                if self.sizeUpButton.GetRect().collidepoint(pygame.mouse.get_pos()):
+                    self.sizeUpButton.draw(self.screen, True)
+                else:
+                    self.sizeUpButton.draw(self.screen, False)
+                if self.sizeDownButton.GetRect().collidepoint(pygame.mouse.get_pos()):
+                    self.sizeDownButton.draw(self.screen, True)
+                else:
+                    self.sizeDownButton.draw(self.screen, False)
                     # If we decide to not make cells the set size of 50 pixels, we'll need a private data member for it
                     # Get the position
                     
@@ -267,6 +315,7 @@ class RandomBoardTicTacToe:
             pygame.display.update()
 
         pygame.quit()
+
 
 tictactoegame = RandomBoardTicTacToe()
 tictactoegame.play_game()
