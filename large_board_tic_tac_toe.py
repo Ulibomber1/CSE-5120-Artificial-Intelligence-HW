@@ -15,6 +15,8 @@ PLEASE READ THE COMMENTS BELOW AND THE HOMEWORK DESCRIPTION VERY CAREFULLY BEFOR
  
 """
 from math import floor
+import string
+from turtle import pos
 import pygame
 import numpy as np
 from GameStatus_5120 import GameStatus
@@ -24,6 +26,35 @@ import sys, random
 
 mode = "player_vs_ai" # default mode for playing the game (player vs AI)
 
+class Button:
+    def __init__(self, text:string, size:int, x:int, y:int, color:tuple, margin:int, buttonColor:tuple, buttonHighlight:tuple):
+        self.text = text
+        self.font = pygame.font.Font("freesansbold.ttf", size)
+        self.color = color
+        self.margin = margin
+        self.buttonColor = buttonColor
+        self.buttonHighlight = buttonHighlight
+        self.textBox = self.font.render(self.text, True, self.color, self.buttonColor)
+        self.highlightTextBox = self.font.render(self.text, True, self.color, self.buttonHighlight)
+        self.pos = (x,y)
+        self.rect = self.textBox.get_rect().inflate(self.margin,self.margin)
+        self.rect.topleft = (self.pos[0] - self.margin / 2, self.pos[1] - self.margin / 2 )
+
+        
+    def GetRect(self):
+        return self.rect
+    
+    def draw(self, screen, isHighlight):
+        if isHighlight:
+            pygame.draw.rect(screen,self.buttonHighlight,self.rect)
+            screen.blit(self.highlightTextBox, self.pos)
+        else:
+            pygame.draw.rect(screen,self.buttonColor,self.rect)
+            screen.blit(self.textBox, self.pos)
+        
+        
+    
+    
 
 class RandomBoardTicTacToe:
     def __init__(self, size = (600, 600)):
@@ -58,6 +89,10 @@ class RandomBoardTicTacToe:
 
         # Initialize pygame
         pygame.init()
+        
+        # This is for GUI buttons
+        self.startButton = Button("Start", 18, self.OFFSET * 2, self.OFFSET * 4 + self.GRID_SIZE * self.HEIGHT, self.WHITE, 10, self.GREEN, self.RED)
+
         self.game_reset()
 
     def draw_game(self):
@@ -81,6 +116,7 @@ class RandomBoardTicTacToe:
             for y in range(0,self.GRID_SIZE):
                 pygame.draw.rect(self.screen,self.WHITE,(self.WIDTH * x + self.OFFSET/2, self.HEIGHT * y + self.OFFSET, self.WIDTH + self.MARGIN, self.HEIGHT + self.MARGIN), self.MARGIN)
                 # add logic here for drawing
+
         pygame.display.flip();
         
     # changes the active turn on the UI, but not the boolean in backend
@@ -213,6 +249,10 @@ class RandomBoardTicTacToe:
                                     self.draw_cross(i * self.WIDTH + self.WIDTH * 0.5 + self.OFFSET, j * self.HEIGHT + self.HEIGHT * 0.5 + self.OFFSET)
 
 
+                if self.startButton.GetRect().collidepoint(pygame.mouse.get_pos()):
+                    self.startButton.draw(self.screen, True)
+                else:
+                    self.startButton.draw(self.screen, False)    
                     # If we decide to not make cells the set size of 50 pixels, we'll need a private data member for it
                     # Get the position
                     
