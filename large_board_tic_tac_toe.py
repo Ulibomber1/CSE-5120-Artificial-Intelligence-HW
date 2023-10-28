@@ -27,7 +27,7 @@ import sys, random
 mode = "player_vs_ai" # default mode for playing the game (player vs AI)
 
 class Button:
-    def __init__(self, text:string, size:int, x:int, y:int, color:tuple, margin:int, buttonColor:tuple, buttonHighlight:tuple):
+    def __init__(self, text:string, size:int, x:int, y:int, margin:int, color:tuple = (255, 255, 255), buttonColor:tuple = (173, 173, 173), buttonHighlight:tuple = (100, 50, 50)):
         self.text = text
         self.font = pygame.font.Font("freesansbold.ttf", size)
         self.color = color
@@ -40,7 +40,7 @@ class Button:
         self.rect = self.textBox.get_rect().inflate(self.margin,self.margin)
         self.rect.topleft = (self.pos[0] - self.margin / 2, self.pos[1] - self.margin / 2 )
 
-        
+    # Return collision rectangle
     def GetRect(self):
         return self.rect
     
