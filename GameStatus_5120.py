@@ -136,14 +136,14 @@ class GameStatus:
 						try:
 							if row + direction[1] < 0 or col + direction[0] < 0:
 								continue
-							if origin_state == self.board_state[row + direction[1],col + direction[0]]:
+							if origin_state == self.board_state[(row + direction[1], col + direction[0])]:
 								accumulatedSequence.append((col + direction[0], row + direction[1]))
 								if row + (2 * direction[1]) < 0 or col + (2 * direction[0]) < 0:
 									continue
 								if len(accumulatedSequence) < 3 and origin_state == self.board_state[row + (2 *direction[1]),col + (2 * direction[0])]:
 									accumulatedSequence.append((col + (2 * direction[0]), row + (2 * direction[1])))
 									break
-						except IndexError:
+						except :
 							pass
 
 					if len(accumulatedSequence) != 3:
@@ -168,6 +168,7 @@ class GameStatus:
 				value = self.board_state[col,row]
 				if self.board_state[col,row] == 0:
 					moves.append((col, row)) # like (x,y)
+		# Shuffle the moves around!
 		return moves
 	
 
