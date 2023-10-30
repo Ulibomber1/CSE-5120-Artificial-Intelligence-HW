@@ -268,17 +268,16 @@ class RandomBoardTicTacToe:
                                 self.draw_circle(cellX * self.WIDTH + self.WIDTH * 0.5 + self.OFFSET, cellY * self.HEIGHT + self.HEIGHT * 0.5 + self.OFFSET )
                             else:
                                 self.draw_cross(cellX * self.WIDTH + self.WIDTH * 0.5 + self.OFFSET, cellY * self.HEIGHT + self.HEIGHT * 0.5 + self.OFFSET)
-                            
+                            self.change_turn()
                             self.move((cellX, cellY))
-                            print(self.game_state.board_state)
-                            print('\n')
+                            pygame.display.update() # show the player's move
                             self.play_ai()
                 elif not self.isPvAI and self.game_state.turn_O:
                     if self.gameStarted:
                         if self.isMinimax:
                             value, location = minimax(self.game_state, 4, not self.game_state.turn_O)
                         else:
-                            value, location = negamax(not self.game_state, 4, -1)
+                            value, location = negamax(self.game_state, 4, 1)
 
                     # Only detect inside the bounds of the grid                        
                     if self.isCircle:
